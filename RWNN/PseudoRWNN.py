@@ -23,17 +23,19 @@ class removeSynapses (Constraint):
 def PseudoRWNN(inputshape,layers,seed):
     #sigmoid activation friendly weight initializations
     tf.random.set_seed(seed)
-    init=initializers.RandomUniform(minval=-1, maxval=1, seed=seed)
+    # init = initializers.glorot_uniform(seed=seed) 
+    init = initializers.RandomUniform(minval=-1, maxval=1, seed=seed)
     rng=np.random.RandomState(seed)
     #construct model using sequential 
     model = Sequential()
-    for l in layers:
-        nodes,act,synrem = l
+    for n,l in enumerate(layers):
+        nodes,act,synrem,bias = l
+        # init = initializers.RandomUniform(minval=-1/float(n+1), maxval=1/float(n+1), seed=seed)
         model.add(Dense(nodes, 
                         activation=act,
                         input_shape=(inputshape,),
-                        use_bias=False,
+                        use_bias=bias,
                         kernel_initializer=init,
                         kernel_constraint=removeSynapses((inputshape,nodes),synrem,rng))
-                 )
+                )
     return model
